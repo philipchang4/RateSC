@@ -1,0 +1,2 @@
+# RateSC
+Campus Rater
