@@ -12,7 +12,7 @@ public class DataModify {
 	
 	private static DataModify dm = new DataModify();
 	ArrayList<Rating> allRatings = new ArrayList<Rating>();
-	ArrayList<RatedObject> allObjects = new ArrayList<RatedObject>();
+	
 	
 	public static DataModify getData() {
 		return dm;
@@ -39,38 +39,63 @@ public class DataModify {
 		return allCategories;
 	}
 	
-	public ArrayList<RatedObject> getRatedObjects(){
-		
+	public ArrayList<RatedObject> getRatedObjectbyCategory(String categoryName){
+		ArrayList<RatedObject> ObjectsbyCategory = new ArrayList<RatedObject>();
 		Connection conn = null;
 		Statement st = null;
 		ResultSet rs = null;
 		try {
 			conn = DriverManager.getConnection("jdbc:mysql://localhost/SCRater?user=root&password=gymnast_82&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC");
 			st = conn.createStatement();
-			rs = st.executeQuery("SELECT* FROM RatedObject");
+			rs = st.executeQuery("SELECT * FROM RatedObject ro, Category c WHERE  \n" + 
+					"ro.categoryID = c.categoryID");
 			while(rs.next()) {
 				String title = rs.getString("title");
 				//Double sum = rs.getDouble("sumRatings");
 				Double avg = rs.getDouble("averageRating");
 				//int total = rs.getInt("totalRatings");
 				RatedObject ro = new RatedObject(title, avg);
-				allObjects.add(ro);
+				ObjectsbyCategory.add(ro);
 			}
 		}
 		catch(SQLException sqle) {
 			System.out.println("sqle: " + sqle.getMessage());
 		}
-		return allObjects;
+		return ObjectsbyCategory;
 	}
-	
-	public void getRatings() {
+	public ArrayList<RatedObject> getRatedObjectbyName(String categoryName, String searchName){
+		ArrayList<RatedObject> ObjectsbyName = new ArrayList<RatedObject>();
 		Connection conn = null;
 		Statement st = null;
 		ResultSet rs = null;
 		try {
 			conn = DriverManager.getConnection("jdbc:mysql://localhost/SCRater?user=root&password=gymnast_82&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC");
 			st = conn.createStatement();
-			rs = st.executeQuery("SELECT * FROM r Rating, ro RatedObject WHERE r.title = ro.title");
+			rs = st.executeQuery("SELECT * FROM RatedObject ro, Category c WHERE\n" + 
+					"ro.categoryID = c.categoryID");
+			while(rs.next()) {
+				String title = rs.getString("title");
+				//Double sum = rs.getDouble("sumRatings");
+				Double avg = rs.getDouble("averageRating");
+				//int total = rs.getInt("totalRatings");
+				RatedObject ro = new RatedObject(title, avg);
+				ObjectsbyName.add(ro);
+			}
+		}
+		catch(SQLException sqle) {
+			System.out.println("sqle: " + sqle.getMessage());
+		}
+		return ObjectsbyName;
+	}
+	
+	public void getRatingsbyRatedObject(ArrayList<RatedObject> ObjectsinCategory) {
+		Connection conn = null;
+		Statement st = null;
+		ResultSet rs = null;
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost/SCRater?user=root&password=gymnast_82&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC");
+			st = conn.createStatement();
+			rs = st.executeQuery("SELECT * FROM Ratings r, RatedObject ro WHERE r.ratedObjectID = ro.ratedObjectID");
 			while(rs.next()) {
 				String title = rs.getString("title");
 				String description = rs.getString("rdescription");
@@ -79,7 +104,7 @@ public class DataModify {
 				Double rating = rs.getDouble("rating");
 				boolean privacy = rs.getBoolean("privacy");
 				Double avg = rs.getDouble("averageRating");
-				RatedObject ro = getRatedObject(title);
+				RatedObject ro = getRatedObject(title, ObjectsinCategory);
 				Rating r = new Rating(ro, description, dateCreated, numLikes, rating, privacy);
 				allRatings.add(r);
 			}
@@ -90,10 +115,42 @@ public class DataModify {
 		}
 	}
 	
-	public RatedObject getRatedObject(String title) {
+	public void getRatingsbyName(String user_name, ArrayList<RatedObject> ObjectsbyName) {
+		Connection conn = null;
+		Statement st = null;
+		ResultSet rs = null;
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost/SCRater?user=root&password=gymnast_82&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC");
+			st = conn.createStatement();
+			rs = st.executeQuery("SELECT userID FROM User WHERE User-name = username");
+			rs.next();
+			Integer id = rs.getInt("userID");
+			rs = st.executeQuery("SELECT * FROM Ratings r, WHERE ro.userID =" + id.toString());
+			while(rs.next()) {
+				String title = rs.getString("title");
+				String description = rs.getString("rdescription");
+				String dateCreated  = rs.getString("date");
+				int numLikes = rs.getInt("likes");
+				Double rating = rs.getDouble("rating");
+				boolean privacy = rs.getBoolean("privacy");
+				Double avg = rs.getDouble("averageRating");
+				RatedObject ro = getRatedObject(title, ObjectsbyName);
+				Rating r = new Rating(ro, description, dateCreated, numLikes, rating, privacy);
+				allRatings.add(r);
+			}
+			
+		}
+		catch(SQLException sqle) {
+			System.out.println("sqle: " + sqle.getMessage());
+		}
+	}
+	
+	
+	
+	public RatedObject getRatedObject(String title, ArrayList<RatedObject> Objects) {
 		for(int i = 0; i < allRatings.size();i++) {
-			if (allObjects.get(i).getName() == title) {
-				return allObjects.get(i);
+			if (Objects.get(i).getName() == title) {
+				return Objects.get(i);
 			}
 		}
 		return null;
@@ -135,16 +192,24 @@ public class DataModify {
 		}
 	}
 	
-	public void likeRating(String title) {
+	public void likeRating(String ro_name) {
 		Connection conn = null;
 		Statement st = null;
 		ResultSet rs = null;
 		try {
 			conn = DriverManager.getConnection("jdbc:mysql://localhost/SCRater?user=root&password=gymnast_82&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC");
 			st = conn.createStatement();
-			rs = st.executeQuery("SELECT * FROM Rating where title=" + title);
-			Integer numRatings = rs.getInt("numLikes");
-			rs = st.executeQuery("UPDATE Rating SET numLikes = " + numRatings.toString()  + "WHERE title= " + title);
+			rs = st.executeQuery("SELECT * FROM Likes i, Ratings r, User u WHERE\n" + 
+					"i.ratingID = r.ratinID AND i.userID=u.userID");
+			int count = 0;
+			while (rs.next()) {
+				Integer numRatings = rs.getInt("numLikes");
+			}
+			if (count == 0) {
+				rs = st.executeQuery("UPDATE Likes SET numLikes = 1 WHERE userID = likeID");
+			}
+			
+			
 			
 		}
 		catch(SQLException sqle) {
@@ -153,4 +218,3 @@ public class DataModify {
 		}
 	}
 }
-
