@@ -10,6 +10,7 @@ import UIKit
 
 class Category: NSObject
 {
+    //var cat: String
     var name: String
     var rating: String
     var descrip: String
