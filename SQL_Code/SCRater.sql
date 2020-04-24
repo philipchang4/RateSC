@@ -18,15 +18,26 @@ CREATE TABLE Rating (
     userID INT NOT NULL,
     FOREIGN KEY fk1(userID) REFERENCES Users(userID)
 );
+CREATE TABLE Category (
+	categoryID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	title VARCHAR(50) NOT NULL
+); 
 CREATE TABLE RatedObject (
+	RatedObjectID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	title VARCHAR(50) NOT NULL,
     sumRatings DOUBLE,
     averageRating DOUBLE,
-    totalRatings INT
+    totalRatings INT,
+    categoryID INT NOT NULL,
+    FOREIGN KEY fk1(categoryID) REFERENCES Category(categoryID)
 );
-CREATE TABLE Category (
-	title VARCHAR(50) NOT NULL
-); 
+CREATE TABLE Likes(
+	likeID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    ratingID INT NOT NULL,
+    userID INT NOT NULL,
+    FOREIGN KEY fk1(ratingID) REFERENCES Rating(ratingID),
+    FOREIGN KEY fk2(userID) REFERENCES Users(userID)
+);
 INSERT INTO Category (title)
 	VALUES ('Restaurants'),
     ('Professors'),
