@@ -8,11 +8,13 @@ import java.util.List;
 public class RatedObject {
 	Double avgRating;
 	String name;
+	Integer RatedObjectID;
 	List<Rating> listRatings;
 	
-	RatedObject(String name, Double avgRating, List<Rating> listRatings) {
+	RatedObject(String name, Double avgRating, Integer RatedObjectID, List<Rating> listRatings) {
 		this.name= name;
 		this.avgRating = avgRating;
+		this.RatedObjectID = RatedObjectID;
 		this.listRatings= listRatings;
 	}
 	public String getName() {
@@ -28,12 +30,18 @@ public class RatedObject {
 	public void setAvgRating(double avgRating) {
 		this.avgRating = avgRating;
 	}
-	public void computeAvgRating() {
-		Double sum = 0.0;
-		for(Rating r: listRatings) {
-			sum += r.getRating();
+	public double computeAvgRating() {
+		if (listRatings.size() != 0) {
+			Double sum = 0.0;
+			for(Rating r: listRatings) {
+				sum += r.getRating();
+			}
+			this.avgRating = sum/(listRatings.size());
 		}
-		this.avgRating = sum/(listRatings.size());
+		else {
+			this.avgRating = 0.0;
+		}
+		return this.avgRating;
 	}
 	
 }

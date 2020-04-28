@@ -23,7 +23,7 @@ public class PopulateDataCSCIClasses {
 				int end= fullText.indexOf('(');
 				int start= fullText.indexOf("CSCI");
 				String classString= fullText.substring(start, end-1);
-				DataModify.getData().addRatedObject(classString, "Classes");
+				DataModify.getData().addRatedObject(classString, "3");
 			}
 		} catch (Exception e){
 			e.printStackTrace();

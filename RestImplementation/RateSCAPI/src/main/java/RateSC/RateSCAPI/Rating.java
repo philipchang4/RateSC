@@ -1,7 +1,7 @@
 package RateSC.RateSCAPI;
 
 public class Rating {
-	private RatedObject ratedObject;
+	private Integer ratedObjectID;
 	private String description;
 	private String dateCreated;
 	private int ID;
@@ -9,20 +9,29 @@ public class Rating {
 	private double rating;
 	private boolean privacy;
 	
-	public Rating(RatedObject ratedObject, String description, String dateCreated, int numLikes,
-			double rating, boolean privacy) {
-		this.ratedObject = ratedObject;
+	public Rating(Integer ratedObjectID, String description, String dateCreated, int numLikes,
+			double rating, boolean privacy, Integer ID) {
+		this.ratedObjectID = ratedObjectID;
 		this.description = description;
 		this.dateCreated = dateCreated;
 		this.numLikes = numLikes;
 		this.rating= rating;
 		this.privacy = privacy;
+		this.ID=ID;
+		
 		
 	}
 	
-	public RatedObject getRatedObject() {
-		return ratedObject;
+	public Integer getRatedObjectID() {
+		return ratedObjectID;
 	}
+
+
+
+	public void setRatedObjectID(Integer ratedObjectID) {
+		this.ratedObjectID = ratedObjectID;
+	}
+	
 	public String getDateCreated() {
 		return dateCreated;
 	}
